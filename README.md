@@ -1,11 +1,11 @@
 # ivideon-php
-![compatible](https://img.shields.io/badge/PHP%207-Compatible-brightgreen.svg) 
+![compatible](https://img.shields.io/badge/PHP%208-Compatible-brightgreen.svg) 
 
 This is PHP Library which allow work with IVideon API
 
 ## Instalation
 ```sh
-composer require antonforwork/ivideon-php
+composer require two-faces/ivideon-php
 ```
 
 ```php

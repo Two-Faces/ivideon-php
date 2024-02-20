@@ -6,5 +6,5 @@ use IVideon\Account;
 
 interface LoginFlowInterface
 {
-    public function login(Account $account, $forceLogin = false);
+    public function login(Account $account, bool $forceLogin = false);
 }

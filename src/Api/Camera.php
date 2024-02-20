@@ -2,6 +2,8 @@
 
 namespace IVideon\Api;
 
+use Closure;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
@@ -19,27 +21,24 @@ class Camera
      *
      * @param Api $api
      */
-    public function __construct(Api $api)
-    {
-        $this->api = $api;
-    }
+    public function __construct(public Api $api) {}
 
     /**
      * Problem with colon in URL
      * IVideon require ID in url like "100-xxxxxxx:01" (see colon)
      * If we push colon in URL guzzle throw exception
-     * If we will encode colon - IVideon API dont understand.
+     * If we will encode colon - IVideon API don't understand.
      *
      * So we have to FORCE send colon with middleware
      *
      * @see https://github.com/guzzle/guzzle/issues/1550
      *
-     * @param $cameraId
-     * @param $query
+     * @param   string  $cameraId
+     * @param   array   $query
      *
-     * @return \Closure
+     * @return Closure
      */
-    protected function buildDirtyRequest($cameraId, $query)
+    protected function buildDirtyRequest(string $cameraId, array $query): Closure
     {
         return function (callable $handler) use ($cameraId, $query) {
             return function (
@@ -65,8 +64,9 @@ class Camera
      * @param $exportId
      *
      * @return bool
+     * @throws GuzzleException
      */
-    public function deleteExport($exportId)
+    public function deleteExport($exportId): bool
     {
         $response = $this->api->request('POST', 'exported_records/'.$exportId, [
             'query' => [
@@ -84,14 +84,15 @@ class Camera
     /**
      * Create export request.
      *
-     * @param $cameraId
-     * @param $start  - Unix timestamp in server timezone
-     * @param $end    - Unix timestamp in server timezone
+     * @param   string  $cameraId
+     * @param   int     $start  - Unix timestamp in server timezone
+     * @param   int     $end    - Unix timestamp in server timezone
      *
      * @return ExportResult
      * @throws ExportRequestFailedException
+     * @throws GuzzleException
      */
-    public function exportMp4($cameraId, $start, $end)
+    public function exportMp4(string $cameraId, int $start, int $end): ExportResult
     {
         $handler = new HandlerStack();
         $handler->setHandler(new CurlHandler());
@@ -99,6 +100,7 @@ class Camera
             'op'           => 'EXPORT',
             'access_token' => $this->api->getAccount()->getAccessToken(),
         ]));
+
         $response = $this->api->request('POST', 'cameras/'.urlencode($cameraId).'/archive?', [
             'handler' => $handler,
             'json'    => [
@@ -107,7 +109,7 @@ class Camera
             ],
         ]);
 
-        if (isset($response['success']) && $response['success'] == false) {
+        if (isset($response['success']) && !$response['success']) {
             throw new ExportRequestFailedException($response['code'] ?? 'no defined error', Constants::EXCEPTION_EXPORT_FAILED);
         }
 
@@ -122,8 +124,9 @@ class Camera
      * @param   array     $camera_ids
      *
      * @return ExportResult[]
+     * @throws GuzzleException
      */
-    public function getExports(int $limit = 100, int $skip = 0, int $from = NULL, int $to = NULL, array $camera_ids = [])
+    public function getExports(int $limit = 100, int $skip = 0, int $from = NULL, int $to = NULL, array $camera_ids = []): array
     {
         $json = [
             'limit' => $limit,

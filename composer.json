@@ -1,5 +1,5 @@
 {
-  "name": "antonforwork/ivideon-php",
+  "name": "two-faces/ivideon-php",
   "description": "IVideon",
   "type": "library",
   "keywords": [
@@ -10,6 +10,10 @@
     {
       "name": "antonforwork",
       "email": "me@anton.in.ua"
+    },
+    {
+      "name": "two-faces",
+      "email": "anton98767@gmail.com"
     }
   ],
   "autoload": {
@@ -18,9 +22,9 @@
     }
   },
   "require": {
-    "php": ">=7.2",
-    "guzzlehttp/guzzle": ">=6",
-    "lazyjsonmapper/lazyjsonmapper": "^1.6"
+    "php": ">=8.0",
+    "guzzlehttp/guzzle": "^7.8.1",
+    "lazyjsonmapper/lazyjsonmapper": "^v2.0.1"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.16"

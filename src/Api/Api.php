@@ -4,6 +4,7 @@ namespace IVideon\Api;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use IVideon\Account;
 use IVideon\Constants;
 use IVideon\Flows\AbstractFlow;
@@ -13,23 +14,23 @@ class Api
     /**
      * @var AbstractFlow|null
      */
-    protected $flow = null;
+    protected ?AbstractFlow $flow = null;
 
-    protected $triedRelogin = false;
+    protected bool $triedRelogin = false;
     /**
      * @var Account
      */
-    protected $account;
+    protected Account $account;
 
     /**
      * @var Servers
      */
-    public $servers;
+    public Servers $servers;
 
     /**
      * @var Camera
      */
-    public $camera;
+    public Camera $camera;
 
     public function __construct(Account $account, AbstractFlow $flow)
     {
@@ -45,12 +46,20 @@ class Api
     /**
      * @return Account
      */
-    public function getAccount()
+    public function getAccount(): Account
     {
         return $this->account;
     }
 
-    public function request($method, $uri, $options = [])
+    /**
+     * @param   string  $method
+     * @param   string  $uri
+     * @param   array   $options
+     *
+     * @return array|null
+     * @throws GuzzleException
+     */
+    public function request(string $method, string $uri, array $options = []): ?array
     {
         $options['query']['access_token'] = $this->account->getAccessToken();
 
@@ -75,7 +84,7 @@ class Api
     /**
      * @return Client
      */
-    protected function buildClient()
+    protected function buildClient(): Client
     {
         return new Client([
             'base_uri' => $this->account->getUserApiUrl(),

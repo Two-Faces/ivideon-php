@@ -2,6 +2,7 @@
 
 namespace IVideon\Api;
 
+use GuzzleHttp\Exception\GuzzleException;
 use IVideon\Responses\Server;
 
 class Servers
@@ -11,18 +12,16 @@ class Servers
      *
      * @param Api $api
      */
-    public function __construct(Api $api)
-    {
-        $this->api = $api;
-    }
+    public function __construct(public Api $api) {}
 
     /**
-     * @param int $limit
-     * @param int $skip
+     * @param   int  $limit
+     * @param   int  $skip
      *
      * @return Server[]
+     * @throws GuzzleException
      */
-    public function getServers($limit = 100, $skip = 0)
+    public function getServers(int $limit = 100, int $skip = 0): array
     {
         $response = $this->api->request('POST', 'servers', [
             'query' => [

@@ -4,13 +4,14 @@ namespace IVideon\Flows;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\GuzzleException;
 use IVideon\Account;
 use IVideon\Constants;
 use IVideon\Exceptions\LoginException;
 
 class WebFlow extends AbstractFlow
 {
-    protected function configureHttpClient($httpClientConfig = [])
+    protected function configureHttpClient(array $httpClientConfig = []): void
     {
         $config = array_merge($httpClientConfig, [
             'cookies' => CookieJar::fromArray(
@@ -23,10 +24,19 @@ class WebFlow extends AbstractFlow
                 'User-Agent' => Constants::HTTPCLIENT_USERAGENT,
             ],
         ]);
+
         $this->httpClient = new Client($config);
     }
 
-    public function login(Account $account, $forceLogin = false)
+    /**
+     * @param   Account  $account
+     * @param   bool     $forceLogin
+     *
+     * @return $this|void
+     * @throws LoginException
+     * @throws GuzzleException
+     */
+    public function login(Account $account, bool $forceLogin = false)
     {
         if (!empty($account->getAccessToken()) && !$forceLogin) {
             return $this;
@@ -52,9 +62,6 @@ class WebFlow extends AbstractFlow
                         'Referer'         => Constants::ENDPOINT_LOGIN,
                     ],
                 ]);
-
-        // get js config object
-        $regexp = null;
 
         $jsonBody = $redirectedPageRequest->getBody()->getContents();
 
